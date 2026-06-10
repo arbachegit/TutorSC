@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useState, type CSSProperties, type ReactNode } from 'react'
+import Link from 'next/link'
 import { SlideEngine, useSlideContext } from '@/components/SlideEngine'
 import { Slide } from '@/components/Slide'
 import { AudioController } from '@/components/AudioController'
 import { PdfDocument } from '@/components/pdf/PdfDocument'
 import { STRINGS, type LangId } from '@/i18n/strings'
+import { SCENES, type Rich } from '@/i18n/scenes'
 
 /* ═══════════════════════════════════════════════════════════════════
    CONSTANTS / DATA
@@ -27,95 +29,50 @@ const URLS: { host: string; path: string }[] = [
   { host: 'learn.iconsai.ai', path: '/company/magisatech/lgpd' },
 ]
 
+/** Visual-only card config — human-readable text lives in i18n/scenes.ts (s2.cards/s2.details). */
 const STUDENT_CARDS: {
-  id: string; title: string; desc: string; accent: string; glyph: string; pct: number; highlight?: boolean
+  id: string; accent: string; glyph: string; pct: number; highlight?: boolean
 }[] = [
-  { id: 'stats', title: 'Estatística', desc: '73 modelos com aulas interativas.', accent: '#22d3ee', glyph: 'σ', pct: 67 },
-  { id: 'python', title: 'Python', desc: 'Notebooks e tutoriais.', accent: '#b88d06', glyph: '>_', pct: 73 },
-  { id: 'finance', title: 'Finanças', desc: 'Modelos, projeções, análise.', accent: '#14b8a6', glyph: '$', pct: 38 },
-  { id: 'esg', title: 'ESG', desc: 'Indicadores e sustentabilidade.', accent: '#1daa51', glyph: '◐', pct: 55 },
-  { id: 'comp', title: 'Compliance', desc: 'LGPD, SOX, ISO.', accent: '#3b82f6', glyph: '§', pct: 49 },
-  { id: 'ia', title: 'IA · Construir minha aplicação', desc: 'Conte sua história. A IA cria a app.', accent: '#a855f7', glyph: '*', pct: 0, highlight: true },
-  { id: 'bi', title: 'BI', desc: 'Dashboards e exploração.', accent: '#ec4899', glyph: '▦', pct: 22 },
-  { id: 'ops', title: 'Operações', desc: 'Processos e SOPs internas.', accent: '#fb923c', glyph: 'Op', pct: 41 },
+  { id: 'stats', accent: '#22d3ee', glyph: 'σ', pct: 67 },
+  { id: 'python', accent: '#b88d06', glyph: '>_', pct: 73 },
+  { id: 'finance', accent: '#14b8a6', glyph: '$', pct: 38 },
+  { id: 'esg', accent: '#1daa51', glyph: '◐', pct: 55 },
+  { id: 'comp', accent: '#3b82f6', glyph: '§', pct: 49 },
+  { id: 'ia', accent: '#a855f7', glyph: '*', pct: 0, highlight: true },
+  { id: 'bi', accent: '#ec4899', glyph: '▦', pct: 22 },
+  { id: 'ops', accent: '#fb923c', glyph: 'Op', pct: 41 },
 ]
 
 type StudentCardId = (typeof STUDENT_CARDS)[number]['id']
 
-const STUDENT_CARD_DETAILS: Record<StudentCardId, {
-  stage: string; owner: string; headline: string
-  outputs: string[]; flow: string[]; metrics: [string, string][]
-}> = {
-  stats: {
-    stage: 'trilha ativa · estatística', owner: 'laboratório quantitativo',
-    headline: 'Modelos guiados, variáveis explicadas e exercícios graduais com feedback automático.',
-    outputs: ['aulas interativas', 'simulações', 'datasets'],
-    flow: ['Escolhe modelo', 'Assiste visualização', 'Resolve exercício'],
-    metrics: [['módulos', '73'], ['exercícios', '214'], ['retenção', '82%']],
-  },
-  python: {
-    stage: 'trilha ativa · python', owner: 'ambiente prático',
-    headline: 'Notebooks curtos com inputs reais, validação por teste e comparação entre solução humana e agent.',
-    outputs: ['notebooks', 'grader', 'snippets'],
-    flow: ['Lê problema', 'Executa código', 'Recebe veredito'],
-    metrics: [['notebooks', '18'], ['tests', '96'], ['latência', '14ms']],
-  },
-  finance: {
-    stage: 'trilha ativa · finanças', owner: 'squad financeiro',
-    headline: 'Projeções, cenários e agentes que explicam impacto de caixa para usuário não técnico.',
-    outputs: ['cenários', 'dashboards', 'planos'],
-    flow: ['Seleciona cenário', 'Ajusta premissas', 'Publica visão executiva'],
-    metrics: [['cenários', '12'], ['premissas', '48'], ['cobertura', '91%']],
-  },
-  esg: {
-    stage: 'trilha ativa · esg', owner: 'governança',
-    headline: 'Indicadores ambientais e sociais cruzados com storytelling para apresentação a conselho.',
-    outputs: ['indicadores', 'narrativas', 'planos de ação'],
-    flow: ['Importa indicador', 'Analisa risco', 'Compartilha plano'],
-    metrics: [['indicadores', '64'], ['ações', '23'], ['engajamento', '76%']],
-  },
-  comp: {
-    stage: 'trilha ativa · compliance', owner: 'jurídico + risco',
-    headline: 'Trilhas de LGPD, SOX e ISO com evidência versionada e app final por colaborador.',
-    outputs: ['checklists', 'políticas', 'apps internas'],
-    flow: ['Escolhe norma', 'Conta processo', 'Publica agente'],
-    metrics: [['normas', '9'], ['artefatos', '38'], ['aderência', '88%']],
-  },
-  ia: {
-    stage: 'trilha ativa · construir minha aplicação', owner: 'builder workspace',
-    headline: 'Fluxo completo de história → script → prompt → simulação → app publicada, sem sair da plataforma.',
-    outputs: ['script', 'prompt', 'app publicada'],
-    flow: ['Conta a história', 'Refina o agent', 'Publica o app'],
-    metrics: [['passos', '4'], ['tempo médio', '7 min'], ['conversão', '63%']],
-  },
-  bi: {
-    stage: 'trilha ativa · BI', owner: 'analytics studio',
-    headline: 'Dashboards navegáveis com explicação em linguagem natural para cada insight crítico.',
-    outputs: ['dashboards', 'insights', 'alertas'],
-    flow: ['Escolhe base', 'Explora insight', 'Compartilha painel'],
-    metrics: [['dashboards', '11'], ['insights', '57'], ['alertas', '19']],
-  },
-  ops: {
-    stage: 'trilha ativa · operações', owner: 'time de processos',
-    headline: 'SOPs, fluxos e simulações de gargalo para times de fábrica, logística e atendimento.',
-    outputs: ['SOPs', 'playbooks', 'simulações'],
-    flow: ['Mapeia gargalo', 'Prioriza ação', 'Roda simulação'],
-    metrics: [['processos', '31'], ['playbooks', '17'], ['gargalos', '8']],
-  },
-}
-
-const STAFF: { name: string; role: string; pct: number; app: string }[] = [
-  { name: 'Ana Ribeiro', role: 'Gestor RH', pct: 100, app: 'Triagem de candidatos' },
-  { name: 'Bruno Castanho', role: 'Fiscal', pct: 85, app: 'Triagem de NF fiscal' },
-  { name: 'Camila Duarte', role: 'Compras', pct: 100, app: 'Cotação automática' },
-  { name: 'Diego Marques', role: 'TI', pct: 60, app: 'Help-desk N1' },
-  { name: 'Elisa Andrade', role: 'Jurídico', pct: 72, app: 'Revisor de contratos' },
-  { name: 'Felipe Souza', role: 'Op. fábrica', pct: 32, app: 'Checklist NR-12' },
+/** Visual-only staff config — role/app labels live in i18n/scenes.ts (s11.staff, parallel array). */
+const STAFF: { name: string; pct: number }[] = [
+  { name: 'Ana Ribeiro', pct: 100 },
+  { name: 'Bruno Castanho', pct: 85 },
+  { name: 'Camila Duarte', pct: 100 },
+  { name: 'Diego Marques', pct: 60 },
+  { name: 'Elisa Andrade', pct: 72 },
+  { name: 'Felipe Souza', pct: 32 },
 ]
 
 /* ═══════════════════════════════════════════════════════════════════
    SMALL HELPERS
    ═══════════════════════════════════════════════════════════════════ */
+
+/** Render rich-text segments from i18n/scenes.ts. */
+function R({ parts }: { parts: Rich[] }) {
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.code ? <code key={i}>{p.t}</code>
+        : p.strong ? <strong key={i}>{p.t}</strong>
+        : p.em ? <em key={i}>{p.t}</em>
+        : p.ok ? <span key={i} className="pok">{p.t}</span>
+        : <span key={i}>{p.t}</span>
+      )}
+    </>
+  )
+}
 
 function Topbar({ role, name, pillText, pillKind }: {
   role: 'student' | 'corp'; name: string; pillText: string
@@ -335,11 +292,12 @@ function SlideOpening({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideLogin({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s1
   return (
     <Slide index={1}>
       <SceneFrame urlIndex={0}>
         <article className="ait-scene ait-scene--s1 a">
-          <Topbar role="student" name="ai.tutor · Login Único" pillKind="cy" pillText="learn.iconsai.ai" />
+          <Topbar role="student" name={sc.topName} pillKind="cy" pillText={sc.pill} />
           <div className="ait-login">
             <div className="ait-login-card d1">
               <div className="ait-login-head">
@@ -349,16 +307,16 @@ function SlideLogin({ lang }: { lang: LangId }) {
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
                 </span>
-                <div className="ait-login-title">Entrar no ecossistema</div>
+                <div className="ait-login-title">{sc.title}</div>
               </div>
-              <div className="ait-field"><label className="ait-field-label">CPF</label><div className="ait-field-input">123.456.789-00</div></div>
+              <div className="ait-field"><label className="ait-field-label">{sc.idLabel}</label><div className="ait-field-input">{sc.idValue}</div></div>
               <div className="ait-field">
-                <label className="ait-field-label">Código SMS</label>
+                <label className="ait-field-label">{sc.smsLabel}</label>
                 <div className="ait-field-input ait-field-input--typing">
                   <span className="ait-otp"><i>4</i><i>8</i><i>2</i><i>1</i><i>5</i><i className="ait-otp-cur">9</i></span>
                 </div>
               </div>
-              <button className="ait-login-btn" type="button">Entrar via Identity Hub</button>
+              <button className="ait-login-btn" type="button">{sc.btn}</button>
               <div className="ait-sso-ring d2">
                 <span className="ait-sso-node ait-sso-node--a">tutor</span>
                 <span className="ait-sso-node ait-sso-node--b">stats</span>
@@ -366,7 +324,7 @@ function SlideLogin({ lang }: { lang: LangId }) {
                 <span className="ait-sso-node ait-sso-node--d">esg</span>
                 <span className="ait-sso-line" />
               </div>
-              <div className="ait-login-foot">Identity Hub · <strong>MagisaTech</strong> · 1 conta, todos os apps</div>
+              <div className="ait-login-foot"><R parts={sc.foot} /></div>
             </div>
           </div>
         </article>
@@ -382,16 +340,17 @@ function SlideLogin({ lang }: { lang: LangId }) {
 
 function SlideDashboard({ lang }: { lang: LangId }) {
   const [selected, setSelected] = useState<StudentCardId>('ia')
+  const sc = SCENES[lang].s2
   const card = STUDENT_CARDS.find((c) => c.id === selected) ?? STUDENT_CARDS[0]
-  const detail = STUDENT_CARD_DETAILS[selected]
+  const detail = sc.details[selected]
   return (
     <Slide index={2}>
       <SceneFrame urlIndex={1}>
         <article className="ait-scene ait-scene--s2 a">
-          <Topbar role="student" name="ai.tutor · Minhas trilhas" pillKind="cy" pillText="ana.ribeiro · MagisaTech" />
+          <Topbar role="student" name={sc.topName} pillKind="cy" pillText={sc.pill} />
           <div className="ait-tabs d1">
-            <span className="ait-tab ait-tab--on"><Icon name="book" /> Áreas disponíveis</span>
-            <span className="ait-tab"><Icon name="settings" /> Minhas apps publicadas</span>
+            <span className="ait-tab ait-tab--on"><Icon name="book" /> {sc.tab1}</span>
+            <span className="ait-tab"><Icon name="settings" /> {sc.tab2}</span>
           </div>
           <div className="ait-cards-shell d2">
             <div className="ait-cards ait-cards-grid">
@@ -408,8 +367,8 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                   >
                     <div className="ait-card-glow" />
                     <div className="ait-card-ic" aria-hidden="true">{c.glyph}</div>
-                    <div className="ait-card-title">{c.title}</div>
-                    <div className="ait-card-desc">{c.desc}</div>
+                    <div className="ait-card-title">{sc.cards[c.id].title}</div>
+                    <div className="ait-card-desc">{sc.cards[c.id].desc}</div>
                     <div className="ait-card-foot">
                       <div className="ait-bar"><div className="ait-bar-fill" /></div>
                       <span className="ait-card-pct">{c.pct}%</span>
@@ -424,7 +383,7 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                 <span className="ait-track-preview-kicker">{detail.stage}</span>
                 <span className="ait-track-preview-owner">{detail.owner}</span>
               </div>
-              <div className="ait-track-preview-title">{card.title}</div>
+              <div className="ait-track-preview-title">{sc.cards[selected].title}</div>
               <p className="ait-track-preview-copy">{detail.headline}</p>
               <div className="ait-track-preview-stats">
                 {detail.metrics.map(([label, value]) => (
@@ -434,13 +393,13 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                 ))}
               </div>
               <div className="ait-track-preview-block">
-                <div className="ait-track-preview-label">outputs esperados</div>
+                <div className="ait-track-preview-label">{sc.outputsLabel}</div>
                 <div className="ait-track-preview-chips">
                   {detail.outputs.map((item) => <span key={item} className="ait-track-chip">{item}</span>)}
                 </div>
               </div>
               <div className="ait-track-preview-block">
-                <div className="ait-track-preview-label">microfluxo da trilha</div>
+                <div className="ait-track-preview-label">{sc.flowLabel}</div>
                 <div className="ait-track-flow">
                   {detail.flow.map((item, idx) => (
                     <div key={item} className="ait-track-flow-row">
@@ -452,7 +411,7 @@ function SlideDashboard({ lang }: { lang: LangId }) {
               </div>
               <div className="ait-track-preview-foot">
                 <span className="ait-track-preview-live-dot" />
-                clique em outra área para simular a troca de contexto do aluno
+                {sc.foot}
               </div>
             </aside>
           </div>
@@ -468,11 +427,12 @@ function SlideDashboard({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideStory({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s3
   return (
     <Slide index={3}>
       <SceneFrame urlIndex={2}>
         <article className="ait-scene ait-scene--s3 a">
-          <Topbar role="student" name="ai.tutor · Conte sua história" pillKind="pr" pillText="passo 1 / 4 · gravando" />
+          <Topbar role="student" name={sc.topName} pillKind="pr" pillText={sc.pill} />
           <div className="ait-story d1">
             <div className="ait-story-left">
               <div className="ait-story-mic-wrap">
@@ -490,29 +450,26 @@ function SlideStory({ lang }: { lang: LangId }) {
               <div className="ait-story-wave" aria-hidden="true">
                 {Array.from({ length: 20 }).map((_, i) => <i key={i} />)}
               </div>
-              <div className="ait-story-rec"><span className="ait-story-rec-dot" /> REC · 00:14</div>
+              <div className="ait-story-rec"><span className="ait-story-rec-dot" /> {sc.rec}</div>
             </div>
             <div className="ait-story-right">
               <div className="ait-story-h">
-                <span className="ait-story-h-k">transcrição ao vivo</span>
-                <span className="ait-story-h-tag">claude-sonnet-4-6 · pt-BR</span>
+                <span className="ait-story-h-k">{sc.liveLabel}</span>
+                <span className="ait-story-h-tag">{sc.tag}</span>
               </div>
               <div className="ait-story-transcript">
-                <span className="st w1">Eu</span>{' '}<span className="st w2">trabalho</span>{' '}<span className="st w3">com</span>{' '}
-                <span className="st w4 st--em">vendas B2B</span>{' '}<span className="st w5">no setor</span>{' '}
-                <span className="st w6 st--em">industrial</span>.{' '}<span className="st w7">Cada cliente</span>{' '}
-                <span className="st w8">me faz</span>{' '}<span className="st w9">as mesmas</span>{' '}
-                <span className="st w10 st--em">5 perguntas</span>{' '}<span className="st w11">no início do funil.</span>{' '}
-                <span className="st w12">Queria</span>{' '}<span className="st w13 st--em">automatizar isso</span>{' '}
-                <span className="st w14">pra</span>{' '}<span className="st w15 st--em">qualificar leads</span>{' '}
-                <span className="st w16">mais rápido</span>...<span className="st-cursor" />
+                {sc.transcript.map((seg, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && ' '}
+                    <span className={`st w${i + 1}${seg.em ? ' st--em' : ''}`}>{seg.t}</span>
+                  </Fragment>
+                ))}
+                ...<span className="st-cursor" />
               </div>
               <div className="ait-story-chips d2">
-                <span className="ait-story-chip ait-story-chip--c1">vendas B2B</span>
-                <span className="ait-story-chip ait-story-chip--c2">industrial</span>
-                <span className="ait-story-chip ait-story-chip--c3">qualificação</span>
-                <span className="ait-story-chip ait-story-chip--c4">leads</span>
-                <span className="ait-story-chip ait-story-chip--c5">automação</span>
+                {sc.chips.map((chip, i) => (
+                  <span key={chip} className={`ait-story-chip ait-story-chip--c${i + 1}`}>{chip}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -528,36 +485,37 @@ function SlideStory({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideScript({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s4
   return (
     <Slide index={4}>
       <SceneFrame urlIndex={3}>
         <article className="ait-scene ait-scene--s4 a">
-          <Topbar role="student" name="ai.tutor · Gerando script" pillKind="pr" pillText="passo 2 / 4 · estruturando" />
+          <Topbar role="student" name={sc.topName} pillKind="pr" pillText={sc.pill} />
           <div className="ait-script d1">
             <div className="ait-script-left">
-              <div className="ait-script-h"><span className="ait-script-h-k">sua história</span></div>
+              <div className="ait-script-h"><span className="ait-script-h-k">{sc.storyLabel}</span></div>
               <div className="ait-script-quote">
-                &ldquo;Eu trabalho com <em>vendas B2B</em> no setor <em>industrial</em>. Cada cliente me faz as mesmas <em>5 perguntas</em> no início do funil. Queria <em>automatizar</em> isso pra <em>qualificar leads</em> mais rápido...&rdquo;
+                <R parts={sc.quote} />
               </div>
             </div>
             <div className="ait-script-right">
               <div className="ait-script-h">
-                <span className="ait-script-h-k">script estruturado</span>
-                <span className="ait-script-h-stat"><span className="ait-script-h-dot" /> Generating script...</span>
+                <span className="ait-script-h-k">{sc.scriptLabel}</span>
+                <span className="ait-script-h-stat"><span className="ait-script-h-dot" /> {sc.generating}</span>
               </div>
               <div className="ait-script-doc">
-                <div className="ait-script-line d2"><span className="sk">STORY</span><span className="sv">→ Vendas B2B industrial</span></div>
-                <div className="ait-script-line d3"><span className="sk">AGENT NAME</span><span className="sv">→ Qualificador de Leads</span></div>
-                <div className="ait-script-line d4"><span className="sk">TOOLS</span><span className="sv">→ CRM lookup · CNPJ enrichment · Email</span></div>
-                <div className="ait-script-line d5">
-                  <span className="sk">FLOW</span>
-                  <span className="sv">
-                    <span className="sf">1. Saúda</span><span className="sf">2. Pergunta pain points</span>
-                    <span className="sf">3. Calcula score</span><span className="sf">4. Roteia</span>
-                  </span>
-                </div>
-                <div className="ait-script-line d6"><span className="sk">GUARDRAILS</span><span className="sv">→ Não promete prazo · Não cita preço</span></div>
-                <div className="ait-script-line ait-script-line--ok d7"><span className="sk">STATUS</span><span className="sv">→ Script gerado <span className="sok">✓</span></span></div>
+                {sc.lines.map((line, i) => (
+                  <div key={line.k} className={`ait-script-line${line.ok ? ' ait-script-line--ok' : ''} d${i + 2}`}>
+                    <span className="sk">{line.k}</span>
+                    {line.flow ? (
+                      <span className="sv">
+                        {line.flow.map((step) => <span key={step} className="sf">{step}</span>)}
+                      </span>
+                    ) : (
+                      <span className="sv">{line.v}{line.ok && <> <span className="sok">✓</span></>}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -573,29 +531,30 @@ function SlideScript({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlidePrompt({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s5
   return (
     <Slide index={5}>
       <SceneFrame urlIndex={4}>
         <article className="ait-scene ait-scene--s5 a">
-          <Topbar role="student" name="ai.tutor · System prompt" pillKind="pr" pillText="passo 3 / 4 · promptando" />
+          <Topbar role="student" name={sc.topName} pillKind="pr" pillText={sc.pill} />
           <div className="ait-prompt d1">
             <div className="ait-prompt-h">
               <div>
-                <div className="ait-prompt-h-t">System prompt do agent</div>
-                <div className="ait-prompt-h-sub">Gerado a partir do script · revisável antes de publicar</div>
+                <div className="ait-prompt-h-t">{sc.headT}</div>
+                <div className="ait-prompt-h-sub">{sc.headSub}</div>
               </div>
               <div className="ait-prompt-stats">
-                <div className="ait-prompt-stat"><span className="ait-prompt-stat-k">tokens</span><span className="ait-prompt-stat-v">1.247</span></div>
+                <div className="ait-prompt-stat"><span className="ait-prompt-stat-k">tokens</span><span className="ait-prompt-stat-v">{sc.tokens}</span></div>
                 <div className="ait-prompt-stat"><span className="ait-prompt-stat-k">model</span><span className="ait-prompt-stat-v ait-prompt-stat-v--cy">claude-sonnet-4-6</span></div>
-                <div className="ait-prompt-stat"><span className="ait-prompt-stat-k">temp</span><span className="ait-prompt-stat-v ait-prompt-stat-v--or">0.3</span></div>
+                <div className="ait-prompt-stat"><span className="ait-prompt-stat-k">temp</span><span className="ait-prompt-stat-v ait-prompt-stat-v--or">{sc.temp}</span></div>
               </div>
             </div>
             <div className="ait-prompt-doc d2">
-              <p className="pp"><span className="pp-tag">/* role */</span> Você é <em>Qualificador de Leads</em> da MagisaTech, especialista em vendas B2B industriais. Seu trabalho é conversar com leads, entender porte da empresa, dor e orçamento, e atribuir score 0–10.</p>
-              <p className="pp"><span className="pp-tag">/* tone */</span> Formal mas direto. Sem jargões. Faz uma pergunta por vez. Não promete prazo. Não cita preço — isso vai pra equipe comercial humana.</p>
-              <p className="pp"><span className="pp-tag">/* tools */</span> Tem acesso a: <code>crm.lookup(cnpj)</code>, <code>cnpj.enrich(cnpj)</code>, <code>email.send(to, body)</code>.</p>
-              <p className="pp"><span className="pp-tag">/* flow */</span> Sempre: 1) saudação, 2) pergunta CNPJ, 3) enriquece, 4) pergunta dor, 5) calcula score, 6) se score ≥ 7 marca reunião, senão envia material.</p>
-              <p className="pp pp--ok"><span className="pp-tag">/* status */</span> <span className="pok">✓ Prompt gerado</span> · revisão do usuário liberada.</p>
+              {sc.paragraphs.map((p) => (
+                <p key={p.tag} className={`pp${p.ok ? ' pp--ok' : ''}`}>
+                  <span className="pp-tag">{p.tag}</span> <R parts={p.parts} />
+                </p>
+              ))}
             </div>
           </div>
         </article>
@@ -610,57 +569,45 @@ function SlidePrompt({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideSimulation({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s6
+  const sliderV = ['--cy', '--pr', '--or']
+  const sliderT = ['--a', '--b', '--c']
   return (
     <Slide index={6}>
       <SceneFrame urlIndex={5}>
         <article className="ait-scene ait-scene--s6 a">
-          <Topbar role="student" name="ai.tutor · Simulação" pillKind="pr" pillText="passo 4 / 4 · testando antes de publicar" />
+          <Topbar role="student" name={sc.topName} pillKind="pr" pillText={sc.pill} />
           <div className="ait-sim2 d1">
             <div className="ait-sim2-chat">
               <div className="ait-sim2-chat-h">
-                <span className="ait-sim2-chat-h-t">Simulação · lead NPC vs seu agent</span>
-                <span className="ait-sim2-chat-h-score">score: <span className="ait-sim2-score">8.7</span> / 10</span>
+                <span className="ait-sim2-chat-h-t">{sc.chatT}</span>
+                <span className="ait-sim2-chat-h-score">{sc.scoreK} <span className="ait-sim2-score">{sc.scoreV}</span> / 10</span>
               </div>
               <div className="ait-sim2-msgs">
-                <div className="ait-sim2-msg ait-sim2-msg--lead d2">
-                  <span className="ait-sim2-msg-who">lead simulado</span>
-                  <span className="ait-sim2-msg-body">Tenho uma indústria de embalagens, 80 funcionários em Guarulhos.</span>
-                </div>
-                <div className="ait-sim2-msg ait-sim2-msg--agent d3">
-                  <span className="ait-sim2-msg-who">seu agent</span>
-                  <span className="ait-sim2-msg-body">Entendo. Vocês exportam ou só mercado interno? Qual o volume mensal?</span>
-                </div>
-                <div className="ait-sim2-msg ait-sim2-msg--lead d4">
-                  <span className="ait-sim2-msg-who">lead simulado</span>
-                  <span className="ait-sim2-msg-body">90% interno. Cerca de 1.200 pedidos/mês. Queríamos automatizar a triagem inicial.</span>
-                </div>
-                <div className="ait-sim2-msg ait-sim2-msg--agent d5">
-                  <span className="ait-sim2-msg-who">seu agent</span>
-                  <span className="ait-sim2-msg-body">Volume relevante. <em>Qual a maior dor hoje:</em> tempo de resposta, perda de pedido, ou qualificação?</span>
-                </div>
+                {sc.msgs.map((m, i) => (
+                  <div key={i} className={`ait-sim2-msg ait-sim2-msg--${m.agent ? 'agent' : 'lead'} d${i + 2}`}>
+                    <span className="ait-sim2-msg-who">{m.agent ? sc.whoAgent : sc.whoLead}</span>
+                    <span className="ait-sim2-msg-body"><R parts={m.parts} /></span>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="ait-sim2-side d6">
-              <div className="ait-sim2-side-h">controles ao vivo</div>
-              <div className="ait-sim2-slider">
-                <div className="ait-sim2-slider-h"><span className="ait-sim2-slider-k">temperatura</span><span className="ait-sim2-slider-v ait-sim2-slider-v--cy">0.42</span></div>
-                <div className="ait-sim2-track"><div className="ait-sim2-track-fill ait-sim2-track-fill--a" /><span className="ait-sim2-thumb ait-sim2-thumb--a" /></div>
-              </div>
-              <div className="ait-sim2-slider">
-                <div className="ait-sim2-slider-h"><span className="ait-sim2-slider-k">persona</span><span className="ait-sim2-slider-v ait-sim2-slider-v--pr">formal</span></div>
-                <div className="ait-sim2-track"><div className="ait-sim2-track-fill ait-sim2-track-fill--b" /><span className="ait-sim2-thumb ait-sim2-thumb--b" /></div>
-              </div>
-              <div className="ait-sim2-slider">
-                <div className="ait-sim2-slider-h"><span className="ait-sim2-slider-k">profundidade técnica</span><span className="ait-sim2-slider-v ait-sim2-slider-v--or">média</span></div>
-                <div className="ait-sim2-track"><div className="ait-sim2-track-fill ait-sim2-track-fill--c" /><span className="ait-sim2-thumb ait-sim2-thumb--c" /></div>
-              </div>
+              <div className="ait-sim2-side-h">{sc.sideTitle}</div>
+              {sc.sliders.map(([k, v], i) => (
+                <div key={k} className="ait-sim2-slider">
+                  <div className="ait-sim2-slider-h"><span className="ait-sim2-slider-k">{k}</span><span className={`ait-sim2-slider-v ait-sim2-slider-v${sliderV[i]}`}>{v}</span></div>
+                  <div className="ait-sim2-track"><div className={`ait-sim2-track-fill ait-sim2-track-fill${sliderT[i]}`} /><span className={`ait-sim2-thumb ait-sim2-thumb${sliderT[i]}`} /></div>
+                </div>
+              ))}
               <div className="ait-sim2-out">
-                <div className="ait-sim2-out-row"><span className="ait-sim2-out-k">outcome</span><span className="ait-sim2-out-v ait-sim2-out-v--gn">Qualificado</span></div>
-                <div className="ait-sim2-out-row"><span className="ait-sim2-out-k">próxima ação</span><span className="ait-sim2-out-v">marcar reunião</span></div>
+                {sc.out.map(([k, v], i) => (
+                  <div key={k} className="ait-sim2-out-row"><span className="ait-sim2-out-k">{k}</span><span className={`ait-sim2-out-v${i === 0 ? ' ait-sim2-out-v--gn' : ''}`}>{v}</span></div>
+                ))}
               </div>
               <div className="ait-sim2-actions">
-                <button className="ait-sim2-btn ait-sim2-btn--ghost" type="button">Refinar</button>
-                <button className="ait-sim2-btn ait-sim2-btn--primary" type="button">Aprovar →</button>
+                <button className="ait-sim2-btn ait-sim2-btn--ghost" type="button">{sc.btnGhost}</button>
+                <button className="ait-sim2-btn ait-sim2-btn--primary" type="button">{sc.btnPrimary}</button>
               </div>
             </div>
           </div>
@@ -675,42 +622,50 @@ function SlideSimulation({ lang }: { lang: LangId }) {
    SLIDE 7 — Tool Builder
    ═══════════════════════════════════════════════════════════════════ */
 
+const TOOL_BLOCK_META = [
+  { cls: 'i', svg: '<polyline points="22 12 16 12 14 15 10 9 8 12 2 12" />' },
+  { cls: 'r', svg: '<circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />' },
+  { cls: 'l', svg: '<path d="M12 2a10 10 0 1 0 10 10" /><path d="M12 2v10l7 4" />' },
+  { cls: 'v', svg: '<polyline points="20 6 9 17 4 12" />' },
+  { cls: 'o', svg: '<line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />' },
+] as const
+
+const TOOL_NODE_POS = [
+  { cls: 'i', left: '5%', top: '32%' },
+  { cls: 'r', left: '28%', top: '14%' },
+  { cls: 'l', left: '50%', top: '32%' },
+  { cls: 'v', left: '28%', top: '60%' },
+  { cls: 'o', left: '74%', top: '42%' },
+] as const
+
 function SlideToolBuilder({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s7
   return (
     <Slide index={7}>
       <SceneFrame urlIndex={6}>
         <article className="ait-scene ait-scene--s7 a">
-          <Topbar role="student" name="ai.tutor · Tool builder" pillKind="cy" pillText="no-code · drag-drop" />
+          <Topbar role="student" name={sc.topName} pillKind="cy" pillText={sc.pill} />
           <div className="ait-tool-wrap d1">
             <div className="ait-tool-side">
-              <div className="ait-tool-side-h">Blocos</div>
-              <span className="ait-tool-block ait-tool-block--i">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 16 12 14 15 10 9 8 12 2 12" /></svg> Input
-              </span>
-              <span className="ait-tool-block ait-tool-block--r">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg> CRM lookup
-              </span>
-              <span className="ait-tool-block ait-tool-block--l">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a10 10 0 1 0 10 10" /><path d="M12 2v10l7 4" /></svg> Claude
-              </span>
-              <span className="ait-tool-block ait-tool-block--v">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg> Score Python
-              </span>
-              <span className="ait-tool-block ait-tool-block--o">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg> Output
-              </span>
+              <div className="ait-tool-side-h">{sc.blocksLabel}</div>
+              {TOOL_BLOCK_META.map((b, i) => (
+                <span key={b.cls} className={`ait-tool-block ait-tool-block--${b.cls}`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" dangerouslySetInnerHTML={{ __html: b.svg }} /> {sc.blocks[i]}
+                </span>
+              ))}
             </div>
             <div className="ait-tool-canvas">
               <div className="ait-tool-canvas-h">
-                <span className="ait-tool-canvas-h-t">Fluxo: Qualificador de Leads</span>
-                <span className="ait-tool-canvas-h-tag">snap-to-grid · conexões ao vivo</span>
+                <span className="ait-tool-canvas-h-t">{sc.canvasT}</span>
+                <span className="ait-tool-canvas-h-tag">{sc.canvasTag}</span>
               </div>
               <div className="ait-tool-flow">
-                <div className="ait-node ait-node--i" style={{ left: '5%', top: '32%' }}><span className="ait-node-k">input</span><span className="ait-node-t">CNPJ + dor</span></div>
-                <div className="ait-node ait-node--r" style={{ left: '28%', top: '14%' }}><span className="ait-node-k">tool</span><span className="ait-node-t">CRM lookup</span></div>
-                <div className="ait-node ait-node--l" style={{ left: '50%', top: '32%' }}><span className="ait-node-k">llm</span><span className="ait-node-t">claude-sonnet-4-6</span></div>
-                <div className="ait-node ait-node--v" style={{ left: '28%', top: '60%' }}><span className="ait-node-k">python</span><span className="ait-node-t">score 0–10</span></div>
-                <div className="ait-node ait-node--o" style={{ left: '74%', top: '42%' }}><span className="ait-node-k">output</span><span className="ait-node-t">roteia comercial</span></div>
+                {TOOL_NODE_POS.map((n, i) => (
+                  <div key={n.cls} className={`ait-node ait-node--${n.cls}`} style={{ left: n.left, top: n.top }}>
+                    <span className="ait-node-k">{sc.nodes[i].k}</span>
+                    <span className="ait-node-t">{sc.nodes[i].t}</span>
+                  </div>
+                ))}
                 <svg className="ait-tool-svg" viewBox="0 0 1000 460" preserveAspectRatio="none" aria-hidden="true">
                   <defs>
                     <linearGradient id="lk1" x1="0" x2="1" y1="0" y2="0">
@@ -726,9 +681,9 @@ function SlideToolBuilder({ lang }: { lang: LangId }) {
                 </svg>
               </div>
               <div className="ait-tool-foot d2">
-                <span className="ait-tool-foot-k">deploy ready</span>
-                <span className="ait-tool-foot-v">/apps/qualificador-leads-magisatech</span>
-                <span className="ait-tool-foot-tag">válida pra empresa</span>
+                <span className="ait-tool-foot-k">{sc.footK}</span>
+                <span className="ait-tool-foot-v">{sc.footV}</span>
+                <span className="ait-tool-foot-tag">{sc.footTag}</span>
               </div>
             </div>
           </div>
@@ -744,16 +699,17 @@ function SlideToolBuilder({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideKaraoke({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s8
   return (
     <Slide index={8}>
       <SceneFrame urlIndex={7}>
         <article className="ait-scene ait-scene--s8 a">
-          <Topbar role="student" name="modo treinamento · karaokê" pillKind="pr" pillText="Tutor ai.t lendo em voz" />
+          <Topbar role="student" name={sc.topName} pillKind="pr" pillText={sc.pill} />
           <div className="ait-lesson-view d1">
             <div className="ait-lesson-head">
               <div>
-                <div className="ait-lesson-h-title">Como ler bem um lead industrial</div>
-                <div className="ait-lesson-h-sub">karaokê word-by-word · gpt-4o-mini-tts</div>
+                <div className="ait-lesson-h-title">{sc.title}</div>
+                <div className="ait-lesson-h-sub">{sc.sub}</div>
               </div>
               <div className="ait-tts-bar">
                 <span className="ait-tts-btn ait-tts-btn--pulse" aria-hidden="true">
@@ -762,28 +718,22 @@ function SlideKaraoke({ lang }: { lang: LangId }) {
                 <div className="ait-tts-wave" aria-hidden="true">
                   {Array.from({ length: 12 }).map((_, i) => <i key={i} />)}
                 </div>
-                <span className="ait-tts-label"><span className="ait-tts-rec-dot" aria-hidden="true" /> Lendo em voz alta...</span>
+                <span className="ait-tts-label"><span className="ait-tts-rec-dot" aria-hidden="true" /> {sc.reading}</span>
               </div>
             </div>
             <div className="ait-karaoke d2">
-              <span className="k k1">Um lead industrial bom</span>{' '}
-              <span className="k k2">tem CNPJ ativo,</span>{' '}
-              <span className="k k3">CNAE coerente,</span>{' '}
-              <span className="k k4">QSA estável</span>{' '}
-              <span className="k k5">e dor mensurável.</span>{' '}
-              <span className="k k6">Se faltar um,</span>{' '}
-              <span className="k k7">o score cai</span>{' '}
-              <span className="k k8">e o agent</span>{' '}
-              <span className="k k9">pede mais contexto</span>{' '}
-              <span className="k k10">antes de roteirizar</span>
-              <span className="k-cite">Fonte 3, item 2.1</span>
-              <span className="k k11">. Exemplo:</span>{' '}
-              <span className="k k12">embalagem com 80 func é médio porte.</span>
+              {sc.karaoke.map((w, i) => (
+                <Fragment key={i}>
+                  {i > 0 && i !== 10 && ' '}
+                  <span className={`k k${i + 1}`}>{w}</span>
+                  {i === 9 && <span className="k-cite">{sc.cite}</span>}
+                </Fragment>
+              ))}
             </div>
             <div className="ait-depth-pills d3">
-              <span className="ait-depth-pill ait-depth-pill--d1">Simples</span>
-              <span className="ait-depth-pill ait-depth-pill--d2">Técnico</span>
-              <span className="ait-depth-pill ait-depth-pill--d3">Exercício</span>
+              {sc.pills.map((p, i) => (
+                <span key={p} className={`ait-depth-pill ait-depth-pill--d${i + 1}`}>{p}</span>
+              ))}
             </div>
           </div>
         </article>
@@ -798,21 +748,22 @@ function SlideKaraoke({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideExercise({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s9
   return (
     <Slide index={9}>
       <SceneFrame urlIndex={8}>
         <article className="ait-scene ait-scene--s9 a">
-          <Topbar role="student" name="exercício · score do lead" pillKind="cy" pillText="Veredito por Python" />
+          <Topbar role="student" name={sc.topName} pillKind="cy" pillText={sc.pill} />
           <div className="ait-ex d1">
             <div className="ait-ex-panel">
-              <div className="ait-ex-h"><span className="ait-ex-h-tag">Exercício</span><span className="ait-ex-h-t">Calculando o score</span></div>
+              <div className="ait-ex-h"><span className="ait-ex-h-tag">{sc.tag}</span><span className="ait-ex-h-t">{sc.t}</span></div>
               <div className="ait-ex-q">
-                Lead com <strong>CNPJ ativo</strong> (+2), <strong>80 func</strong> (+3), <strong>dor clara</strong> (+3) e <strong>orçamento aprovado</strong> (+1). Qual o score final?
+                <R parts={sc.question} />
               </div>
-              <div className="ait-ex-input">9<span className="ait-cursor" /></div>
+              <div className="ait-ex-input">{sc.answer}<span className="ait-cursor" /></div>
               <div className="ait-ex-actions">
-                <button className="ait-ex-btn ait-ex-btn--primary" type="button">Conferir</button>
-                <button className="ait-ex-btn ait-ex-btn--ghost" type="button">Mais fácil</button>
+                <button className="ait-ex-btn ait-ex-btn--primary" type="button">{sc.btnCheck}</button>
+                <button className="ait-ex-btn ait-ex-btn--ghost" type="button">{sc.btnEasier}</button>
               </div>
             </div>
             <div className="ait-ex-result d2">
@@ -828,10 +779,10 @@ function SlideExercise({ lang }: { lang: LangId }) {
               </div>
               <div className="ait-ex-result-h">
                 <span className="ait-ex-result-check" aria-hidden="true">✓</span>
-                <span className="ait-ex-result-t">Correto · Score: 9.2/10</span>
-                <span className="ait-ex-result-q">Python · 12ms</span>
+                <span className="ait-ex-result-t">{sc.resultT}</span>
+                <span className="ait-ex-result-q">{sc.resultQ}</span>
               </div>
-              <div className="ait-ex-result-tutor">Bom: você somou os pesos certos. Python entrega veredito; LLM só humaniza, não avalia.</div>
+              <div className="ait-ex-result-tutor">{sc.tutor}</div>
             </div>
           </div>
         </article>
@@ -846,11 +797,12 @@ function SlideExercise({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlidePublished({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s10
   return (
     <Slide index={10}>
       <SceneFrame urlIndex={9}>
         <article className="ait-scene ait-scene--s10 a">
-          <Topbar role="student" name="ai.tutor · aplicação publicada" pillKind="gn" pillText="ao vivo · em produção" />
+          <Topbar role="student" name={sc.topName} pillKind="gn" pillText={sc.pill} />
           <div className="ait-pub d1">
             <div className="ait-pub-confetti" aria-hidden="true">
               <i className="cf cf-1" /><i className="cf cf-2" /><i className="cf cf-3" />
@@ -858,7 +810,7 @@ function SlidePublished({ lang }: { lang: LangId }) {
               <i className="cf cf-7" /><i className="cf cf-8" /><i className="cf cf-9" />
             </div>
             <div className="ait-pub-card">
-              <div className="ait-pub-badge"><span className="ait-pub-badge-check" aria-hidden="true">✓</span> PUBLICADO</div>
+              <div className="ait-pub-badge"><span className="ait-pub-badge-check" aria-hidden="true">✓</span> {sc.badge}</div>
               <div className="ait-pub-app-head">
                 <div className="ait-pub-app-ic" aria-hidden="true">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -868,8 +820,8 @@ function SlidePublished({ lang }: { lang: LangId }) {
                   </svg>
                 </div>
                 <div>
-                  <div className="ait-pub-app-name">Qualificador de Leads</div>
-                  <div className="ait-pub-app-org">MagisaTech · Vendas B2B</div>
+                  <div className="ait-pub-app-name">{sc.appName}</div>
+                  <div className="ait-pub-app-org">{sc.appOrg}</div>
                 </div>
               </div>
               <div className="ait-pub-url">
@@ -880,22 +832,22 @@ function SlidePublished({ lang }: { lang: LangId }) {
                 </svg>
                 <span className="ait-pub-url-host">apps.iconsai.ai</span>
                 <span className="ait-pub-url-path">/qualificador-leads-magisatech</span>
-                <span className="ait-pub-url-copy">copiar</span>
+                <span className="ait-pub-url-copy">{sc.copy}</span>
               </div>
               <div className="ait-pub-desc">
-                Agent que conversa com leads industriais, enriquece CNPJ, faz 5 perguntas de qualificação e roteia pra comercial humano se score ≥ 7.
+                {sc.desc}
               </div>
               <div className="ait-pub-stats">
-                <div className="ait-pub-stat"><span className="ait-pub-stat-v">23</span><span className="ait-pub-stat-k">conversas hoje</span></div>
-                <div className="ait-pub-stat"><span className="ait-pub-stat-v ait-pub-stat-v--gn">7</span><span className="ait-pub-stat-k">leads qualificados</span></div>
-                <div className="ait-pub-stat"><span className="ait-pub-stat-v ait-pub-stat-v--cy">91%</span><span className="ait-pub-stat-k">satisfação</span></div>
+                <div className="ait-pub-stat"><span className="ait-pub-stat-v">23</span><span className="ait-pub-stat-k">{sc.statLabels[0]}</span></div>
+                <div className="ait-pub-stat"><span className="ait-pub-stat-v ait-pub-stat-v--gn">7</span><span className="ait-pub-stat-k">{sc.statLabels[1]}</span></div>
+                <div className="ait-pub-stat"><span className="ait-pub-stat-v ait-pub-stat-v--cy">91%</span><span className="ait-pub-stat-k">{sc.statLabels[2]}</span></div>
               </div>
               <div className="ait-pub-actions">
-                <button className="ait-pub-btn ait-pub-btn--primary" type="button">Acessar app →</button>
-                <button className="ait-pub-btn" type="button">Compartilhar</button>
-                <button className="ait-pub-btn ait-pub-btn--ghost" type="button">Editar</button>
+                <button className="ait-pub-btn ait-pub-btn--primary" type="button">{sc.btns[0]}</button>
+                <button className="ait-pub-btn" type="button">{sc.btns[1]}</button>
+                <button className="ait-pub-btn ait-pub-btn--ghost" type="button">{sc.btns[2]}</button>
               </div>
-              <div className="ait-pub-foot">Publicado em <strong>2.3s</strong> · v1 · standalone</div>
+              <div className="ait-pub-foot"><R parts={sc.foot} /></div>
             </div>
           </div>
         </article>
@@ -910,26 +862,27 @@ function SlidePublished({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideRH({ lang }: { lang: LangId }) {
+  const sc = SCENES[lang].s11
   return (
     <Slide index={11}>
       <SceneFrame urlIndex={10}>
         <article className="ait-scene ait-scene--s11 a">
-          <Topbar role="corp" name="MagisaTech · RH" pillKind="or" pillText="6 colaboradores · apps personalizadas" />
+          <Topbar role="corp" name={sc.topName} pillKind="or" pillText={sc.pill} />
           <div className="ait-rh-wrap d1">
             <div className="ait-rh-head">
               <div>
-                <div className="ait-rh-h-t">Trilha Compliance LGPD · MagisaTech</div>
-                <div className="ait-rh-h-sub">cada colaborador sai com sua própria app de IA</div>
+                <div className="ait-rh-h-t">{sc.headT}</div>
+                <div className="ait-rh-h-sub">{sc.headSub}</div>
               </div>
               <div className="ait-rh-kpis">
                 <div className="ait-kpi" style={{ ['--accent' as string]: '#22c55e' } as CSSProperties}>
-                  <span className="ait-kpi-v">3</span><span className="ait-kpi-k">apps publicadas</span>
+                  <span className="ait-kpi-v">3</span><span className="ait-kpi-k">{sc.kpiLabels[0]}</span>
                 </div>
                 <div className="ait-kpi" style={{ ['--accent' as string]: '#22d3ee' } as CSSProperties}>
-                  <span className="ait-kpi-v">79%</span><span className="ait-kpi-k">média trilha</span>
+                  <span className="ait-kpi-v">79%</span><span className="ait-kpi-k">{sc.kpiLabels[1]}</span>
                 </div>
                 <div className="ait-kpi" style={{ ['--accent' as string]: '#a855f7' } as CSSProperties}>
-                  <span className="ait-kpi-v">6</span><span className="ait-kpi-k">histórias gravadas</span>
+                  <span className="ait-kpi-v">6</span><span className="ait-kpi-k">{sc.kpiLabels[2]}</span>
                 </div>
               </div>
             </div>
@@ -944,14 +897,14 @@ function SlideRH({ lang }: { lang: LangId }) {
                   <span className="ait-staff-av" aria-hidden="true">{p.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}</span>
                   <div className="ait-staff-id">
                     <span className="ait-staff-name">{p.name}</span>
-                    <span className="ait-staff-role">{p.role}</span>
+                    <span className="ait-staff-role">{sc.staff[i].role}</span>
                   </div>
-                  <span className="ait-staff-app" title={p.app}>
+                  <span className="ait-staff-app" title={sc.staff[i].app}>
                     <svg className="ait-staff-app-ic" width="12" height="12" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
-                    <span className="ait-staff-app-name">{p.app}</span>
+                    <span className="ait-staff-app-name">{sc.staff[i].app}</span>
                   </span>
                   <div className="ait-staff-bar"><div className="ait-staff-bar-fill" /></div>
                   <span className="ait-staff-pct">{p.pct}%</span>
@@ -984,6 +937,9 @@ function SlideClosing({ lang }: { lang: LangId }) {
           </span>
         </div>
         <span className="ait-closing-url a d3">{s.url ?? 'iconsai.ai/tutor'}</span>
+        <Link className="ait-closing-pdf a d4" href={`/pdf?lang=${lang}`}>
+          {lang === 'en' ? 'View document version' : 'Ver vers\u00E3o documento'} {'\u2192'}
+        </Link>
       </div>
     </Slide>
   )

@@ -8,11 +8,12 @@
     "prebuild": "bash audit-css.sh && bash valida-skill.sh",
     "build": "next build",
     "audit:css": "bash audit-css.sh",
+    "audit:fit": "node scripts/audit-fit.mjs",
     "start": "next start -p 3104",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.5.15",
+    "next": "^15.5.19",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -20,6 +21,7 @@
     "@types/node": "22.10.5",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
+    "playwright-core": "^1.60.0",
     "typescript": "5.7.3"
   }
 }

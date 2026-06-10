@@ -73,6 +73,24 @@ grep -q 'body::before' "$CSS" 2>/dev/null || fail F22 "body::before ausente"
 grep -q 'body::after' "$CSS" 2>/dev/null || fail F22 "body::after ausente"
 grep -q '#06080d' "$CSS" 2>/dev/null || fail F22 "cor #06080d das faixas ausente"
 
+# F18: .slide-content NÃO pode ter overflow:hidden (mascara scrollHeight → corte)
+css_block_has '\.slide-content' 'overflow:[ ]*hidden' "$CSS" \
+  && fail F18 ".slide-content tem overflow:hidden (mascara scrollHeight — §6.11)"
+
+# F18b: .slide-stage DEVE ter overflow:hidden (clip no limite do palco)
+css_block_has '\.slide-stage' 'overflow:[ ]*hidden' "$CSS" \
+  || fail F18 ".slide-stage sem overflow:hidden (§6.11)"
+
+# F20: font-size < 12px em classes de slide (exclui secção .pdf-* — escala A4 print)
+F20_HITS=$(awk '/\.pdf-doc|DOCUMENTO PDF/{pdf=1} !pdf && /font-size:[ ]*([0-9]|1[01])(\.[0-9]+)?px/' "$CSS" \
+  | grep -vE 'slide-counter|slide-foot__legal|slide-head__kicker' || true)
+[ -n "$F20_HITS" ] && fail F20 "font-size < 12px em slide (§6.13): $(echo "$F20_HITS" | head -3 | tr '\n' ' ')"
+
+# F11 (CSS): max-width em pixel em classes de act (.ait-*) — só ch é permitido em texto
+F11_HITS=$(awk '/\.pdf-doc|DOCUMENTO PDF/{pdf=1} !pdf && /max-width:[ ]*[0-9]+px[ ]*;/' "$CSS" \
+  | grep -vE 'slide-head|slide-foot|reading-panel' || true)
+[ -n "$F11_HITS" ] && fail F11 "max-width em px em visual de act (§6.10): $(echo "$F11_HITS" | head -3 | tr '\n' ' ')"
+
 # ═══ 2. TSX (componentes) ═══
 
 # F5: max-w-grid PROIBIDO em wrappers de slide
@@ -95,6 +113,32 @@ for f in $FRAME_FILES2; do
   grep -qE 'offset(Width|Height)' "$f" 2>/dev/null \
     && fail F10 "$f: offsetWidth/Height no fit() (usar scrollWidth/Height)"
 done
+
+# F6: items-center PROIBIDO em Shell de slide
+SHELL_DEF=$(grep -rlE 'function Shell|const Shell' components/ 2>/dev/null || true)
+for f in $SHELL_DEF; do
+  grep -qE 'items-center' "$f" 2>/dev/null \
+    && fail F6 "$f: Shell com items-center (usar items-stretch)"
+done
+
+# F11 (TSX): max-w-[Npx] PROIBIDO em visuais (só max-w-[Nch] em texto)
+grep -rnE 'max-w-\[[0-9]+px\]' app/ components/ --include='*.tsx' 2>/dev/null | grep -v 'pdf' | grep -q . \
+  && fail F11 "max-w-[Npx] em TSX de act (§6.10)"
+
+# F18 (TSX): overflow-hidden PROIBIDO em wrappers de act (mascara scrollHeight)
+grep -rnE 'overflow-hidden' app/page.tsx components/ --include='*.tsx' 2>/dev/null | grep -v 'pdf' | grep -q . \
+  && fail F18 "overflow-hidden em TSX de act (§6.11)"
+
+# F25: fit() DEVE usar o truque height:auto antes de medir scrollHeight (§6.18)
+FIT_FILES=$(grep -rlE 'UPCAP' components/ 2>/dev/null || true)
+for f in $FIT_FILES; do
+  grep -qE "style\.height *= *['\"]auto['\"]" "$f" 2>/dev/null \
+    || fail F25 "$f: fit() sem content.style.height='auto' antes de medir (§6.18)"
+done
+
+# F26: min-h-[Npx] PROIBIDO em container visual (usar flex-1 min-h-0)
+grep -rnE 'min-h-\[[0-9]+px\]' app/ components/ --include='*.tsx' 2>/dev/null | grep -v 'pdf' | grep -q . \
+  && fail F26 "min-h-[Npx] em container visual (usar flex-1 min-h-0 — §6.6)"
 
 # ═══ RESULTADO ═══
 if [ $FAIL -eq 0 ]; then

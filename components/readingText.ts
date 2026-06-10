@@ -15,7 +15,8 @@ const MAP: Record<LangId, Record<number, string>> = {
 }
 
 export function getReading(lang: LangId, slide0: number): string {
-  const raw = MAP[lang]?.[slide0 + 1] ?? ''
+  // Narration ids = slide index (id 1 = login at index 1); opening (index 0) has no narration.
+  const raw = MAP[lang]?.[slide0] ?? ''
   return raw
     .replace(/iconsai\.ai barra tutor/gi, 'iconsai.ai/tutor')
     .replace(/iconsai\.ai slash tutor/gi, 'iconsai.ai/tutor')
