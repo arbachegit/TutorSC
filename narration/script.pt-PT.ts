@@ -1,0 +1,15 @@
+/** Guiao pt-PT -- narracao do deck tutor (1-indexed). */
+export const NARRATION: Record<number, string> = {
+  1: 'O ai.tutor comeca pelo login unico. O colaborador digita o NIF, recebe um codigo SMS via Infobip, e entra no ecossistema inteiro com uma so conta. Sem palavra-passe, sem cadastro duplicado. O Identity Hub da iconsai liga tutor, stats, python, ESG e todas as outras aplicacoes.',
+  2: 'No painel, o aluno ve oito areas de conhecimento. Cada cartao mostra o progresso do percurso. O destaque roxo e "IA, construir a minha aplicacao", onde tudo comeca: o aluno vai contar uma historia de trabalho e sai com uma app de IA publicada.',
+  3: 'Passo um: storytelling por voz. O aluno carrega em gravar, fala naturalmente sobre o que faz no trabalho e que problema quer resolver. A IA transcreve em tempo real com claude sonnet quatro ponto seis e extrai palavras-chave: vendas B2B, industrial, qualificacao, leads, automacao.',
+  4: 'Passo dois: a IA pega na historia transcrita e gera um guiao estruturado. Define o nome do agente, as ferramentas que vai usar, o fluxo de conversa e os guardrails. Tudo visivel para o aluno rever antes de avancar.',
+  5: 'Passo tres: do guiao nasce o system prompt. Mil duzentos e quarenta e sete tokens, modelo claude sonnet quatro ponto seis, temperatura zero virgula tres. O prompt define papel, tom, ferramentas e fluxo em linguagem natural. O aluno pode editar antes de publicar.',
+  6: 'Passo quatro: antes de publicar, o aluno testa. A simulacao poe o agente dele contra um lead simulado pela IA. Pontuacao oito virgula sete em dez. Controlos ao vivo ajustam temperatura, persona e profundidade tecnica. Se aprovar, publica. Se nao, refina.',
+  7: 'O tool builder mostra o fluxo visual do agente. Cinco blocos no-code: input, CRM lookup, Claude, score Python, output. Cada ligacao aparece ao vivo. Deploy ready, caminho da URL ja definido.',
+  8: 'Modo treino: karaoke word-by-word com TTS da OpenAI. Cada palavra acende ao ritmo da leitura. Tres pills de profundidade: simples, tecnico e exercicio. O aluno escolhe o nivel e a IA reescreve.',
+  9: 'Exercicio com veredito por Python. O aluno calcula a pontuacao do lead: NIF ativo mais dois, oitenta funcionarios mais tres, dor clara mais tres, orcamento aprovado mais um. Resposta: nove. O grader.py corre os testes e devolve pass, erro zero, doze milissegundos.',
+  10: 'Climax: a aplicacao foi publicada. URL real: apps.iconsai.ai barra qualificador-leads-magisatech. Vinte e tres conversas, sete leads qualificados, noventa e um por cento de satisfacao. Publicado em dois virgula tres segundos, versao um, standalone.',
+  11: 'Visao RH da MagisaTech: percurso compliance LGPD com seis colaboradores. Cada um saiu com a sua propria app de IA. Ana Ribeiro, cem por cento, triagem de candidatos. Bruno Castanho, oitenta e cinco por cento, triagem fiscal. Tres apps publicadas, media de setenta e nove por cento no percurso.',
+  12: 'O ai.tutor transforma cada colaborador num construtor de IA. Conta a historia, a IA monta o guiao, o prompt, a ferramenta e publica. Nao e magia, e tecnologia. Apresentacao disponivel em iconsai.ai barra tutor.',
+}
