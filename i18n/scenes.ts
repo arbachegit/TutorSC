@@ -37,6 +37,7 @@ export interface SceneStrings {
     outputsLabel: string
     flowLabel: string
     foot: string
+    tooltip: string
     cards: Record<string, CardText>
     details: Record<string, CardDetail>
   }
@@ -151,18 +152,19 @@ export const SCENES: Record<LangId, SceneStrings> = {
       btn: 'Entrar via Identity Hub',
       foot: [
         { t: 'Identity Hub · ' },
-        { t: 'MagisaTech', strong: true },
+        { t: 'IconsAI', strong: true },
         { t: ' · 1 conta, todos os apps' },
       ],
     },
     s2: {
       topName: 'ai.tutor · Minhas trilhas',
-      pill: 'ana.ribeiro · MagisaTech',
+      pill: 'ana.ribeiro · IconsAI',
       tab1: 'Áreas disponíveis',
       tab2: 'Minhas apps publicadas',
       outputsLabel: 'outputs esperados',
       flowLabel: 'microfluxo da trilha',
       foot: 'clique em outra área para simular a troca de contexto do aluno',
+      tooltip: 'Clique para iniciar a construção. Conte sua história e a IA monta o app completo.',
       cards: {
         stats: { title: 'Estatística', desc: '73 modelos com aulas interativas.' },
         python: { title: 'Python', desc: 'Notebooks e tutoriais.' },
@@ -307,7 +309,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
           parts: [
             { t: 'Você é o ' },
             { t: 'Qualificador de Leads', strong: true },
-            { t: ' da MagisaTech. Seu papel é conversar com leads industriais, entender o porte da empresa, a dor principal e o orçamento — e atribuir um ' },
+            { t: ' da IconsAI. Seu papel é conversar com leads industriais, entender o porte da empresa, a dor principal e o orçamento — e atribuir um ' },
             { t: 'score de 0–10', strong: true },
             { t: '.' },
           ],
@@ -399,7 +401,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
         { k: 'OUTPUT', t: 'roteia comercial' },
       ],
       footK: 'DEPLOY READY',
-      footV: '/apps/qualificador-leads-magisatech',
+      footV: '/apps/qualificador-leads-iconsai',
       footTag: 'válida pra empresa',
     },
     s8: {
@@ -453,7 +455,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
       pill: 'ao vivo · em produção',
       badge: 'PUBLICADO',
       appName: 'Qualificador de Leads',
-      appOrg: 'MagisaTech · Vendas B2B',
+      appOrg: 'IconsAI · Vendas B2B',
       copy: 'copiar',
       desc: 'Agente que conversa com leads industriais, enriquece o CNPJ, faz 5 perguntas de qualificação e roteia pro comercial humano se score ≥ 7.',
       statLabels: ['conversas hoje', 'leads qualificados', 'satisfação'],
@@ -465,9 +467,9 @@ export const SCENES: Record<LangId, SceneStrings> = {
       ],
     },
     s11: {
-      topName: 'MagisaTech · RH',
+      topName: 'IconsAI · RH',
       pill: '6 colaboradores · apps personalizadas',
-      headT: 'Trilha Compliance LGPD · MagisaTech',
+      headT: 'Trilha Compliance LGPD · IconsAI',
       headSub: 'cada colaborador sai com sua própria app de IA',
       kpiLabels: ['apps publicadas', 'média trilha', 'histórias gravadas'],
       staff: [
@@ -491,18 +493,19 @@ export const SCENES: Record<LangId, SceneStrings> = {
       btn: 'Entrar via Identity Hub',
       foot: [
         { t: 'Identity Hub · ' },
-        { t: 'MagisaTech', strong: true },
+        { t: 'IconsAI', strong: true },
         { t: ' · 1 conta, todas as apps' },
       ],
     },
     s2: {
       topName: 'ai.tutor · Os meus percursos',
-      pill: 'ana.ribeiro · MagisaTech',
+      pill: 'ana.ribeiro · IconsAI',
       tab1: 'Áreas disponíveis',
       tab2: 'As minhas apps publicadas',
       outputsLabel: 'outputs esperados',
       flowLabel: 'microfluxo do percurso',
       foot: 'clique noutra área para simular a troca de contexto do aluno',
+      tooltip: 'Clique para iniciar a construção. Conte a sua história e a IA monta a app completa.',
       cards: {
         stats: { title: 'Estatística', desc: '73 modelos com aulas interativas.' },
         python: { title: 'Python', desc: 'Notebooks e tutoriais.' },
@@ -647,7 +650,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
           parts: [
             { t: 'És o ' },
             { t: 'Qualificador de Leads', strong: true },
-            { t: ' da MagisaTech. O teu papel é conversar com leads industriais, perceber a dimensão da empresa, a dor principal e o orçamento — e atribuir uma ' },
+            { t: ' da IconsAI. O teu papel é conversar com leads industriais, perceber a dimensão da empresa, a dor principal e o orçamento — e atribuir uma ' },
             { t: 'pontuação de 0–10', strong: true },
             { t: '.' },
           ],
@@ -739,7 +742,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
         { k: 'OUTPUT', t: 'encaminha comercial' },
       ],
       footK: 'DEPLOY READY',
-      footV: '/apps/qualificador-leads-magisatech',
+      footV: '/apps/qualificador-leads-iconsai',
       footTag: 'válida para a empresa',
     },
     s8: {
@@ -793,7 +796,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
       pill: 'ao vivo · em produção',
       badge: 'PUBLICADA',
       appName: 'Qualificador de Leads',
-      appOrg: 'MagisaTech · Vendas B2B',
+      appOrg: 'IconsAI · Vendas B2B',
       copy: 'copiar',
       desc: 'Agente que conversa com leads industriais, enriquece o NIPC, faz 5 perguntas de qualificação e encaminha para o comercial humano se a pontuação ≥ 7.',
       statLabels: ['conversas hoje', 'leads qualificados', 'satisfação'],
@@ -805,9 +808,9 @@ export const SCENES: Record<LangId, SceneStrings> = {
       ],
     },
     s11: {
-      topName: 'MagisaTech · RH',
+      topName: 'IconsAI · RH',
       pill: '6 colaboradores · apps personalizadas',
-      headT: 'Percurso Compliance RGPD · MagisaTech',
+      headT: 'Percurso Compliance RGPD · IconsAI',
       headSub: 'cada colaborador sai com a sua própria app de IA',
       kpiLabels: ['apps publicadas', 'média do percurso', 'histórias gravadas'],
       staff: [
@@ -831,18 +834,19 @@ export const SCENES: Record<LangId, SceneStrings> = {
       btn: 'Sign in via Identity Hub',
       foot: [
         { t: 'Identity Hub · ' },
-        { t: 'MagisaTech', strong: true },
+        { t: 'IconsAI', strong: true },
         { t: ' · one account, every app' },
       ],
     },
     s2: {
       topName: 'ai.tutor · My tracks',
-      pill: 'ana.ribeiro · MagisaTech',
+      pill: 'ana.ribeiro · IconsAI',
       tab1: 'Available areas',
       tab2: 'My published apps',
       outputsLabel: 'expected outputs',
       flowLabel: 'track microflow',
       foot: 'click another area to simulate the student context switch',
+      tooltip: 'Click to start building. Tell your story and the AI builds the complete app.',
       cards: {
         stats: { title: 'Statistics', desc: '73 models with interactive lessons.' },
         python: { title: 'Python', desc: 'Notebooks and tutorials.' },
@@ -987,7 +991,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
           parts: [
             { t: 'You are the ' },
             { t: 'Lead Qualifier', strong: true },
-            { t: ' at MagisaTech. Your job is to talk to industrial leads, understand company size, the main pain and the budget — and assign a ' },
+            { t: ' at IconsAI. Your job is to talk to industrial leads, understand company size, the main pain and the budget — and assign a ' },
             { t: '0–10 score', strong: true },
             { t: '.' },
           ],
@@ -1079,7 +1083,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
         { k: 'OUTPUT', t: 'routes to sales' },
       ],
       footK: 'DEPLOY READY',
-      footV: '/apps/qualificador-leads-magisatech',
+      footV: '/apps/qualificador-leads-iconsai',
       footTag: 'valid for the company',
     },
     s8: {
@@ -1133,7 +1137,7 @@ export const SCENES: Record<LangId, SceneStrings> = {
       pill: 'live · in production',
       badge: 'PUBLISHED',
       appName: 'Lead Qualifier',
-      appOrg: 'MagisaTech · B2B Sales',
+      appOrg: 'IconsAI · B2B Sales',
       copy: 'copy',
       desc: 'An agent that talks to industrial leads, enriches the EIN, asks 5 qualification questions and routes to a human salesperson if the score is ≥ 7.',
       statLabels: ['conversations today', 'qualified leads', 'satisfaction'],
@@ -1145,9 +1149,9 @@ export const SCENES: Record<LangId, SceneStrings> = {
       ],
     },
     s11: {
-      topName: 'MagisaTech · HR',
+      topName: 'IconsAI · HR',
       pill: '6 employees · personalized apps',
-      headT: 'Privacy Compliance Track · MagisaTech',
+      headT: 'Privacy Compliance Track · IconsAI',
       headSub: 'every employee walks out with their own AI app',
       kpiLabels: ['published apps', 'track average', 'stories recorded'],
       staff: [

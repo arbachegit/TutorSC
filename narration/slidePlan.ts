@@ -131,7 +131,7 @@ export const SLIDE_PLANS: SlidePlan[] = [
     temaChave: 'A empresa enxerga o progresso de cada colaborador.',
     focalSVG: 'Tabela de equipe com barras de progresso + KPIs de apps publicadas',
     explanation: 'Visão RH: trilha, apps publicadas e desempenho por pessoa, em tempo real.',
-    dataKeys: ['3 apps publicadas', '79% média na trilha', '6 colaboradores (mockup MagisaTech, §8.5 tipo 2)'],
+    dataKeys: ['3 apps publicadas', '79% média na trilha', '6 colaboradores (mockup IconsAI, §8.5 tipo 2)'],
     didatica: 'Fechar o loop: o investimento em treinamento vira métrica auditável de produção.',
     layout: 'side-by-side',
     priority: 4,

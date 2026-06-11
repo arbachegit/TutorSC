@@ -961,6 +961,75 @@ body::after {
 .ait-track-preview-foot { font-family: var(--ait-mono); font-size: 12px; color: var(--ait-t3); display: flex; align-items: center; gap: 6px; margin-top: auto; }
 .ait-track-preview-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ait-gn); animation: aitDotPulse 1.4s ease-in-out infinite; }
 
+/* ── Empty track preview state ── */
+.ait-track-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  border: 2px dashed rgba(168,85,247,0.20); border-radius: 8px;
+  color: var(--ait-t3); font-size: 12px; text-align: center;
+  padding: 24px;
+}
+.ait-track-empty-icon { opacity: 0.4; color: var(--ait-pr); }
+.ait-track-empty-msg { max-width: 22ch; line-height: 1.4; }
+
+/* ── Virtual mouse cursor ── */
+.ait-vmouse {
+  position: absolute; z-index: 20; pointer-events: none;
+  opacity: 0;
+  top: 25%; left: 15%;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+.slide[data-active="true"] .ait-vmouse {
+  animation: aitVmouseMove 4s ease-in-out 1.0s forwards;
+}
+.slide[data-seen="true"]:not([data-active="true"]) .ait-vmouse { display: none; }
+
+@keyframes aitVmouseMove {
+  0%   { top: 25%; left: 15%; opacity: 0; transform: scale(1); }
+  8%   { top: 25%; left: 15%; opacity: 1; transform: scale(1); }
+  45%  { top: 62%; left: 32%; opacity: 1; transform: scale(1); }
+  55%  { top: 62%; left: 32%; opacity: 1; transform: scale(1); }
+  62%  { top: 62%; left: 32%; opacity: 1; transform: scale(0.85); }
+  67%  { top: 62%; left: 32%; opacity: 1; transform: scale(1); }
+  80%  { top: 62%; left: 32%; opacity: 1; transform: scale(1); }
+  100% { top: 62%; left: 32%; opacity: 0; transform: scale(1); }
+}
+
+/* ── Tooltip near cursor ── */
+.ait-vmouse-tip {
+  position: absolute; z-index: 21; pointer-events: none;
+  top: 52%; left: 36%;
+  max-width: 24ch; padding: 10px 14px;
+  background: rgba(12,16,28,0.95); border: 1px solid rgba(168,85,247,0.40);
+  border-radius: 8px; backdrop-filter: blur(12px);
+  font-size: 12px; color: #e0e0e0; line-height: 1.4;
+  opacity: 0; transform: translateY(4px);
+}
+.slide[data-active="true"] .ait-vmouse-tip {
+  animation: aitTipShow 4s ease 1.0s forwards;
+}
+.slide[data-seen="true"]:not([data-active="true"]) .ait-vmouse-tip { display: none; }
+
+@keyframes aitTipShow {
+  0%, 37%  { opacity: 0; transform: translateY(4px); }
+  43%      { opacity: 1; transform: translateY(0); }
+  58%      { opacity: 1; transform: translateY(0); }
+  65%      { opacity: 0; transform: translateY(-4px); }
+  100%     { opacity: 0; }
+}
+
+/* ── IA card hover effect during mouse animation ── */
+.slide[data-active="true"] .ait-card--hl {
+  animation: aitCardHl 2.6s ease-in-out infinite,
+             aitCardHover 4s ease 1.0s forwards;
+}
+@keyframes aitCardHover {
+  0%, 40%   { box-shadow: 0 0 0 1px rgba(168,85,247,0.30), 0 12px 28px rgba(168,85,247,0.18); }
+  50%       { box-shadow: 0 0 0 2px rgba(168,85,247,0.7), 0 16px 44px rgba(168,85,247,0.40); }
+  62%, 67%  { box-shadow: 0 0 0 3px rgba(168,85,247,0.9), 0 0 60px rgba(168,85,247,0.30); }
+  80%, 100% { box-shadow: 0 0 0 1px rgba(168,85,247,0.30), 0 12px 28px rgba(168,85,247,0.18); }
+}
+
 /* ── Scene 3: Storytelling ── */
 .ait-story { flex: 1; display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
 .ait-story-left { background: var(--ait-bg); border: 1px solid rgba(168,85,247,0.20); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }

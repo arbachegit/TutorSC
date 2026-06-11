@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import { SlideEngine, useSlideContext } from '@/components/SlideEngine'
 import { Slide } from '@/components/Slide'
@@ -25,8 +25,8 @@ const URLS: { host: string; path: string }[] = [
   { host: 'learn.iconsai.ai', path: '/build/flow' },
   { host: 'learn.iconsai.ai', path: '/training/lead-reading' },
   { host: 'learn.iconsai.ai', path: '/training/lead-reading/exercise' },
-  { host: 'apps.iconsai.ai', path: '/qualificador-leads-magisatech' },
-  { host: 'learn.iconsai.ai', path: '/company/magisatech/lgpd' },
+  { host: 'apps.iconsai.ai', path: '/qualificador-leads-iconsai' },
+  { host: 'learn.iconsai.ai', path: '/company/iconsai/lgpd' },
 ]
 
 /** Visual-only card config — human-readable text lives in i18n/scenes.ts (s2.cards/s2.details). */
@@ -42,8 +42,6 @@ const STUDENT_CARDS: {
   { id: 'bi', accent: '#ec4899', glyph: '▦', pct: 22 },
   { id: 'ops', accent: '#fb923c', glyph: 'Op', pct: 41 },
 ]
-
-type StudentCardId = (typeof STUDENT_CARDS)[number]['id']
 
 /** Visual-only staff config — role/app labels live in i18n/scenes.ts (s11.staff, parallel array). */
 const STAFF: { name: string; pct: number }[] = [
@@ -342,10 +340,21 @@ function SlideLogin({ lang }: { lang: LangId }) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function SlideDashboard({ lang }: { lang: LangId }) {
-  const [selected, setSelected] = useState<StudentCardId>('ia')
+  const { currentSlide, seenSlides } = useSlideContext()
+  const isActive = currentSlide === 2
+  const wasSeen = seenSlides.has(2)
+  const [revealed, setRevealed] = useState(false)
   const sc = SCENES[lang].s2
-  const card = STUDENT_CARDS.find((c) => c.id === selected) ?? STUDENT_CARDS[0]
-  const detail = sc.details[selected]
+  const detail = sc.details['ia']
+  const card = STUDENT_CARDS.find((c) => c.id === 'ia')!
+
+  useEffect(() => {
+    if (wasSeen && !isActive) { setRevealed(true); return }
+    if (!isActive) { setRevealed(false); return }
+    const timer = setTimeout(() => setRevealed(true), 3800)
+    return () => clearTimeout(timer)
+  }, [isActive, wasSeen])
+
   return (
     <Slide index={2}>
       <SceneFrame urlIndex={1}>
@@ -357,66 +366,88 @@ function SlideDashboard({ lang }: { lang: LangId }) {
           </div>
           <div className="ait-cards-shell d2">
             <div className="ait-cards ait-cards-grid">
-              {STUDENT_CARDS.map((c) => {
-                const isSelected = c.id === selected
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className={`ait-card ait-card-button ${c.highlight ? 'ait-card--hl' : ''}${isSelected ? ' ait-card--selected' : ''}`}
-                    style={{ ['--accent' as string]: c.accent, ['--pct' as string]: `${c.pct}%` } as CSSProperties}
-                    onClick={() => setSelected(c.id)}
-                    aria-pressed={isSelected}
-                  >
-                    <div className="ait-card-glow" />
-                    <div className="ait-card-ic" aria-hidden="true">{c.glyph}</div>
-                    <div className="ait-card-title">{sc.cards[c.id].title}</div>
-                    <div className="ait-card-desc">{sc.cards[c.id].desc}</div>
-                    <div className="ait-card-foot">
-                      <div className="ait-bar"><div className="ait-bar-fill" /></div>
-                      <span className="ait-card-pct">{c.pct}%</span>
-                    </div>
-                    {c.highlight && <div className="ait-card-cursor" aria-hidden="true" />}
-                  </button>
-                )
-              })}
+              {STUDENT_CARDS.map((c) => (
+                <div
+                  key={c.id}
+                  className={`ait-card${c.highlight ? ' ait-card--hl' : ''}`}
+                  style={{ ['--accent' as string]: c.accent, ['--pct' as string]: `${c.pct}%` } as CSSProperties}
+                >
+                  <div className="ait-card-glow" />
+                  <div className="ait-card-ic" aria-hidden="true">{c.glyph}</div>
+                  <div className="ait-card-title">{sc.cards[c.id].title}</div>
+                  <div className="ait-card-desc">{sc.cards[c.id].desc}</div>
+                  <div className="ait-card-foot">
+                    <div className="ait-bar"><div className="ait-bar-fill" /></div>
+                    <span className="ait-card-pct">{c.pct}%</span>
+                  </div>
+                </div>
+              ))}
             </div>
             <aside className="ait-track-preview" style={{ ['--accent' as string]: card.accent } as CSSProperties}>
-              <div className="ait-track-preview-head">
-                <span className="ait-track-preview-kicker">{detail.stage}</span>
-                <span className="ait-track-preview-owner">{detail.owner}</span>
-              </div>
-              <div className="ait-track-preview-title">{sc.cards[selected].title}</div>
-              <p className="ait-track-preview-copy">{detail.headline}</p>
-              <div className="ait-track-preview-stats">
-                {detail.metrics.map(([label, value]) => (
-                  <div key={label} className="ait-track-stat">
-                    <span>{label}</span><strong>{value}</strong>
+              {!revealed ? (
+                <div className="ait-track-empty">
+                  <div className="ait-track-empty-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
                   </div>
-                ))}
-              </div>
-              <div className="ait-track-preview-block">
-                <div className="ait-track-preview-label">{sc.outputsLabel}</div>
-                <div className="ait-track-preview-chips">
-                  {detail.outputs.map((item) => <span key={item} className="ait-track-chip">{item}</span>)}
+                  <span className="ait-track-empty-msg">{sc.foot}</span>
                 </div>
-              </div>
-              <div className="ait-track-preview-block">
-                <div className="ait-track-preview-label">{sc.flowLabel}</div>
-                <div className="ait-track-flow">
-                  {detail.flow.map((item, idx) => (
-                    <div key={item} className="ait-track-flow-row">
-                      <span className="ait-track-flow-step">{idx + 1}</span>
-                      <span>{item}</span>
+              ) : (
+                <>
+                  <div className="ait-track-preview-head tw-line" style={{ '--tw-d': '0s' } as CSSProperties}>
+                    <span className="ait-track-preview-kicker">{detail.stage}</span>
+                    <span className="ait-track-preview-owner">{detail.owner}</span>
+                  </div>
+                  <div className="ait-track-preview-title tw-line" style={{ '--tw-d': '0.3s' } as CSSProperties}>
+                    {sc.cards['ia'].title}
+                  </div>
+                  <p className="ait-track-preview-copy tw-line" style={{ '--tw-d': '0.5s' } as CSSProperties}>
+                    {detail.headline}
+                  </p>
+                  <div className="ait-track-preview-stats tw-line" style={{ '--tw-d': '1.0s' } as CSSProperties}>
+                    {detail.metrics.map(([label, value]) => (
+                      <div key={label} className="ait-track-stat">
+                        <span>{label}</span><strong>{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="ait-track-preview-block tw-line" style={{ '--tw-d': '1.4s' } as CSSProperties}>
+                    <div className="ait-track-preview-label">{sc.outputsLabel}</div>
+                    <div className="ait-track-preview-chips">
+                      {detail.outputs.map((item) => <span key={item} className="ait-track-chip">{item}</span>)}
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div className="ait-track-preview-foot">
-                <span className="ait-track-preview-live-dot" />
-                {sc.foot}
-              </div>
+                  </div>
+                  <div className="ait-track-preview-block tw-line" style={{ '--tw-d': '1.8s' } as CSSProperties}>
+                    <div className="ait-track-preview-label">{sc.flowLabel}</div>
+                    <div className="ait-track-flow">
+                      {detail.flow.map((item, idx) => (
+                        <div key={item} className="ait-track-flow-row">
+                          <span className="ait-track-flow-step">{idx + 1}</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="ait-track-preview-foot tw-line" style={{ '--tw-d': '2.2s' } as CSSProperties}>
+                    <span className="ait-track-preview-live-dot" />
+                    {sc.foot}
+                  </div>
+                </>
+              )}
             </aside>
+          </div>
+
+          {/* Virtual mouse cursor */}
+          <div className="ait-vmouse" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M5 3l14 8-6 2-4 6z" fill="#fff" stroke="#1a1a2e" strokeWidth="1.5" strokeLinejoin="round" />
+            </svg>
+          </div>
+
+          {/* Tooltip near IA card */}
+          <div className="ait-vmouse-tip" aria-hidden="true">
+            {sc.tooltip}
           </div>
         </article>
       </SceneFrame>
@@ -859,7 +890,7 @@ function SlidePublished({ lang }: { lang: LangId }) {
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <span className="ait-pub-url-host">apps.iconsai.ai</span>
-                <span className="ait-pub-url-path">/qualificador-leads-magisatech</span>
+                <span className="ait-pub-url-path">/qualificador-leads-iconsai</span>
                 <span className="ait-pub-url-copy">{sc.copy}</span>
               </div>
               <div className="ait-pub-desc">
