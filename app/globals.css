@@ -669,8 +669,8 @@ body::after {
   margin: 0;
   font-family: var(--ait-sans);
   font-weight: 900;
-  font-size: clamp(30px, 4.8vw, 78px);
-  line-height: 1.18;
+  font-size: clamp(18px, 2.6vw, 42px);
+  line-height: 1.25;
   letter-spacing: -0.02em;
   color: #fff;
   opacity: 0;
@@ -1327,7 +1327,7 @@ body::after {
   .ait-staff-app { display: none; }
   .ait-staff-bar { display: none; }
   .ait-op-wordmark { font-size: clamp(48px, 12vw, 120px); }
-  .ait-op-q { font-size: clamp(20px, 5vw, 40px); }
+  .ait-op-q { font-size: clamp(14px, 3.8vw, 24px); }
 
   /* Act compression — mobile (§6.6: visual simplificado, paddings mínimos) */
   .slide-content { gap: 10px; }
