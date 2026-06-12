@@ -1402,6 +1402,19 @@ body::after {
 .tw-line .ait-cursor { opacity: 0; transition: opacity 0.2s ease; }
 .slide[data-active="true"] .tw-line .ait-cursor { opacity: 1; }
 
+/* Track preview cursor (S2) — blinking cursor at the front of typewriter text */
+.trk-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: currentColor;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  opacity: 0;
+}
+.slide[data-active="true"] .trk-cursor { animation-play-state: running !important; }
+.slide[data-seen="true"]:not([data-active="true"]) .trk-cursor { display: none; }
+
 /* Per-message cursor for chat simulation (S6) — timed to each message's reveal */
 @keyframes aitCursorVanish { to { visibility: hidden } }
 .sim-cursor {

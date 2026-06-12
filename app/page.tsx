@@ -401,9 +401,11 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                   </div>
                   <div className="ait-track-preview-title">
                     <span className="tw-prop" style={{ '--tw-d': '0.8s', '--tw-dur': '0.8s' } as CSSProperties}>{sc.cards['ia'].title}</span>
+                    <span className="trk-cursor" style={{ animation: `aitCursorBlink 0.7s steps(2) 0.8s infinite, aitCursorVanish 0.01s linear 1.6s forwards`, animationPlayState: 'paused' } as CSSProperties} />
                   </div>
                   <p className="ait-track-preview-copy">
                     <span className="tw-prop" style={{ '--tw-d': '1.4s', '--tw-dur': '1.6s' } as CSSProperties}>{detail.headline}</span>
+                    <span className="trk-cursor" style={{ animation: `aitCursorBlink 0.7s steps(2) 1.4s infinite, aitCursorVanish 0.01s linear 3.0s forwards`, animationPlayState: 'paused' } as CSSProperties} />
                   </p>
                   <div className="ait-track-preview-stats tw-line" style={{ '--tw-d': '2.2s' } as CSSProperties}>
                     {detail.metrics.map(([label, value]) => (
@@ -415,6 +417,7 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                   <div className="ait-track-preview-block tw-line" style={{ '--tw-d': '2.8s' } as CSSProperties}>
                     <div className="ait-track-preview-label">
                       <span className="tw-prop" style={{ '--tw-d': '2.8s', '--tw-dur': '0.6s' } as CSSProperties}>{sc.outputsLabel}</span>
+                      <span className="trk-cursor" style={{ animation: `aitCursorBlink 0.7s steps(2) 2.8s infinite, aitCursorVanish 0.01s linear 3.4s forwards`, animationPlayState: 'paused' } as CSSProperties} />
                     </div>
                     <div className="ait-track-preview-chips">
                       {detail.outputs.map((item) => <span key={item} className="ait-track-chip">{item}</span>)}
@@ -423,6 +426,7 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                   <div className="ait-track-preview-block tw-line" style={{ '--tw-d': '3.4s' } as CSSProperties}>
                     <div className="ait-track-preview-label">
                       <span className="tw-prop" style={{ '--tw-d': '3.4s', '--tw-dur': '0.6s' } as CSSProperties}>{sc.flowLabel}</span>
+                      <span className="trk-cursor" style={{ animation: `aitCursorBlink 0.7s steps(2) 3.4s infinite, aitCursorVanish 0.01s linear 4.0s forwards`, animationPlayState: 'paused' } as CSSProperties} />
                     </div>
                     <div className="ait-track-flow">
                       {detail.flow.map((item, idx) => (
