@@ -566,6 +566,7 @@ function SlideScript({ lang }: { lang: LangId }) {
                     )}
                   </div>
                 ))}
+                <span className="ait-cursor tw-line" style={{ '--tw-d': `${0.4 + sc.lines.length * 0.5}s` } as CSSProperties} />
               </div>
             </div>
           </div>
@@ -655,6 +656,7 @@ function SlideSimulation({ lang }: { lang: LangId }) {
                     </div>
                   )
                 })}
+                <span className="ait-cursor tw-line" style={{ '--tw-d': `${0.3 + sc.msgs.length * 1.0}s` } as CSSProperties} />
               </div>
             </div>
             <div className="ait-sim2-side d6">
