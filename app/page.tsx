@@ -83,6 +83,17 @@ function twStyle(text: string, delay: number, speed = 0.04): CSSProperties {
   } as CSSProperties
 }
 
+/** Typewriter without blinking cursor — for segments that share a single cursor element */
+function twStyleNoCursor(text: string, delay: number, speed = 0.025): CSSProperties {
+  const n = text.length
+  const dur = Math.max(0.12, n * speed)
+  return {
+    '--tw-ch': `${n}ch`,
+    animation: `aitType ${dur.toFixed(2)}s steps(${n}, end) ${delay.toFixed(2)}s both`,
+    animationPlayState: 'paused',
+  } as CSSProperties
+}
+
 function Topbar({ role, name, pillText, pillKind }: {
   role: 'student' | 'corp'; name: string; pillText: string
   pillKind: 'cy' | 'or' | 'gn' | 'pr'
@@ -500,13 +511,20 @@ function SlideStory({ lang }: { lang: LangId }) {
                 <span className="ait-story-h-tag">{sc.tag}</span>
               </div>
               <div className="ait-story-transcript">
-                {sc.transcript.map((seg, i) => (
-                  <Fragment key={i}>
-                    {i > 0 && ' '}
-                    <span className={`st${seg.em ? ' st--em' : ''}`} style={{ '--tw-d': `${0.3 + i * 0.15}s` } as CSSProperties}>{seg.t}</span>
-                  </Fragment>
-                ))}
-                ...<span className="st-cursor" />
+                {(() => {
+                  let d = 0.5
+                  return sc.transcript.map((seg, i) => {
+                    const text = (i > 0 ? ' ' : '') + seg.t
+                    const segD = d
+                    d += Math.max(0.12, text.length * 0.025) + 0.02
+                    return (
+                      <span key={i} className={`tw${seg.em ? ' st--em' : ''}`}
+                        style={twStyleNoCursor(text, segD)}>{text}</span>
+                    )
+                  })
+                })()}
+                <span className="st-ellipsis tw-line" style={{ '--tw-d': `${0.5 + sc.transcript.reduce((a, s, i) => a + Math.max(0.12, ((i > 0 ? 1 : 0) + s.t.length) * 0.025) + 0.02, 0)}s` } as CSSProperties}>...</span>
+                <span className="st-cursor" />
               </div>
               <div className="ait-story-chips d2">
                 {sc.chips.map((chip, i) => (
@@ -601,13 +619,30 @@ function SlidePrompt({ lang }: { lang: LangId }) {
               </div>
             </div>
             <div className="ait-prompt-doc d2">
-              {sc.paragraphs.map((p, i) => (
-                <p key={p.tag} className={`pp${p.ok ? ' pp--ok' : ''} tw-line`}
-                  style={{ '--tw-d': `${0.5 + i * 0.45}s` } as CSSProperties}>
-                  <span className="pp-tag">{p.tag}</span> <R parts={p.parts} />
-                </p>
-              ))}
-              <span className="ait-cursor tw-line" style={{ '--tw-d': `${0.5 + sc.paragraphs.length * 0.45}s` } as CSSProperties} />
+              {(() => {
+                let d = 0.5
+                return sc.paragraphs.map((p, pi) => {
+                  const baseD = d
+                  d += 0.25
+                  return (
+                    <p key={p.tag} className={`pp${p.ok ? ' pp--ok' : ''} tw-line`}
+                      style={{ '--tw-d': `${baseD.toFixed(2)}s` } as CSSProperties}>
+                      <span className="pp-tag">{p.tag}</span>{' '}
+                      {p.parts.map((part, ri) => {
+                        const partD = d
+                        d += 0.15
+                        return (
+                          <span key={ri} className="tw-line"
+                            style={{ '--tw-d': `${partD.toFixed(2)}s` } as CSSProperties}>
+                            <R parts={[part]} />
+                          </span>
+                        )
+                      })}
+                    </p>
+                  )
+                })
+              })()}
+              <span className="ait-cursor tw-line" style={{ '--tw-d': `${0.5 + sc.paragraphs.reduce((a, p) => a + 0.25 + p.parts.length * 0.15, 0)}s` } as CSSProperties} />
             </div>
           </div>
         </article>
@@ -656,7 +691,6 @@ function SlideSimulation({ lang }: { lang: LangId }) {
                     </div>
                   )
                 })}
-                <span className="ait-cursor tw-line" style={{ '--tw-d': `${0.3 + sc.msgs.length * 1.0}s` } as CSSProperties} />
               </div>
             </div>
             <div className="ait-sim2-side d6">

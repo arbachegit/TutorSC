@@ -1102,8 +1102,9 @@ body::after {
 .slide[data-active="true"] .ait-story-transcript .st,
 .slide[data-seen="true"] .ait-story-transcript .st { opacity: 1; }
 .ait-story-transcript .st--em { color: var(--ait-pr); font-weight: 700; }
-.st-cursor { display: inline-block; width: 8px; height: 22px; background: var(--ait-pr); margin-left: 4px; vertical-align: middle; animation: aitCursorBlink 0.5s steps(2) infinite; opacity: 0; transition: opacity 0.2s ease 2.5s; }
+.st-cursor { display: inline-block; width: 8px; height: 22px; background: var(--ait-pr); margin-left: 4px; vertical-align: middle; animation: aitCursorBlink 0.5s steps(2) infinite; opacity: 0; transition: opacity 0.2s ease 3.8s; }
 .slide[data-active="true"] .st-cursor { opacity: 1; }
+.slide[data-seen="true"]:not([data-active="true"]) .st-cursor { opacity: 1; transition-delay: 0s; }
 .ait-story-chips { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed rgba(168,85,247,0.18); }
 .ait-story-chip { font-family: var(--ait-mono); font-size: 12px; padding: 4px 10px; border-radius: 12px; background: rgba(168,85,247,0.10); border: 1px solid rgba(168,85,247,0.25); color: var(--ait-pr); }
 
@@ -1385,6 +1386,13 @@ body::after {
   border-right-color: transparent !important;
   animation: none !important;
 }
+
+/* ── Transcript typewriter segments (no individual cursor) ── */
+.ait-story-transcript .tw { border-right: none; vertical-align: baseline; }
+.st-ellipsis { display: inline; font-style: normal; color: var(--ait-t2); }
+
+/* ── Prompt per-part reveal (inline tw-line inside paragraphs) ── */
+.ait-prompt-doc .pp > .tw-line { display: inline; transform: none; }
 
 /* ── Typewriter line-reveal (paragraphs, chat messages, console lines) ── */
 .tw-line {
