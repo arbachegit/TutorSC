@@ -1151,7 +1151,9 @@ body::after {
 .ait-sim2-chat-h { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px dashed var(--ait-brd); }
 .ait-sim2-chat-h-t { font-family: var(--ait-mono); font-size: 12px; color: var(--ait-pr); letter-spacing: 0.06em; }
 .ait-sim2-chat-h-score { font-family: var(--ait-mono); font-size: 12px; color: var(--ait-t2); }
-.ait-sim2-score { font-size: 16px; font-weight: 700; color: var(--ait-gn); font-variant-numeric: tabular-nums; animation: aitScorePulse 1.6s ease-in-out infinite; }
+.ait-sim2-score { font-size: 16px; font-weight: 700; color: var(--ait-gn); font-variant-numeric: tabular-nums; display: inline-block; opacity: 0; transform: scale(0); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.slide[data-active="true"] .ait-sim2-score { opacity: 1; transform: scale(1); transition-delay: 3.4s; animation: aitScorePulse 1.6s ease-in-out 3.8s infinite; }
+.slide[data-seen="true"] .ait-sim2-score { opacity: 1; transform: scale(1); transition-duration: 0s; transition-delay: 0s; animation: aitScorePulse 1.6s ease-in-out infinite; }
 @keyframes aitScorePulse { 0%, 100% { transform: scale(1); text-shadow: 0 0 8px rgba(34,197,94,0.30); } 50% { transform: scale(1.08); text-shadow: 0 0 16px rgba(34,197,94,0.60); } }
 .ait-sim2-msgs { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 .ait-sim2-msg { display: flex; flex-direction: column; gap: 4px; max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
@@ -1169,21 +1171,37 @@ body::after {
 .ait-sim2-slider-v--cy { color: var(--ait-cy); }
 .ait-sim2-slider-v--pr { color: var(--ait-pr); }
 .ait-sim2-slider-v--or { color: var(--ait-or); }
-.ait-sim2-track { position: relative; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; }
-.ait-sim2-track-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 3px; }
-.ait-sim2-track-fill--a { background: var(--ait-cy); width: 42%; }
-.ait-sim2-track-fill--b { background: var(--ait-pr); width: 64%; }
-.ait-sim2-track-fill--c { background: var(--ait-or); width: 50%; }
-.ait-sim2-thumb { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--ait-pr); transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,0.30); }
-.ait-sim2-thumb--a { left: 42%; border-color: var(--ait-cy); }
-.ait-sim2-thumb--b { left: 64%; border-color: var(--ait-pr); }
-.ait-sim2-thumb--c { left: 50%; border-color: var(--ait-or); }
-.ait-sim2-out { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--ait-brd); display: flex; flex-direction: column; gap: 4px; }
+.ait-sim2-track { position: relative; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.ait-sim2-track-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 3px; width: 0; transition: width 0.9s cubic-bezier(0.16,1,0.3,1); }
+.ait-sim2-track-fill--a { background: var(--ait-cy); transition-delay: 1.6s; }
+.ait-sim2-track-fill--b { background: var(--ait-pr); transition-delay: 2.0s; }
+.ait-sim2-track-fill--c { background: var(--ait-or); transition-delay: 2.4s; }
+.slide[data-active="true"] .ait-sim2-track-fill--a,
+.slide[data-seen="true"] .ait-sim2-track-fill--a { width: 42%; }
+.slide[data-active="true"] .ait-sim2-track-fill--b,
+.slide[data-seen="true"] .ait-sim2-track-fill--b { width: 64%; }
+.slide[data-active="true"] .ait-sim2-track-fill--c,
+.slide[data-seen="true"] .ait-sim2-track-fill--c { width: 50%; }
+.slide[data-seen="true"]:not([data-active="true"]) .ait-sim2-track-fill { transition-duration: 0s; transition-delay: 0s; }
+.ait-sim2-thumb { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--ait-pr); transform: translate(-50%, -50%) scale(0); box-shadow: 0 2px 8px rgba(0,0,0,0.30); opacity: 0; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease; }
+.ait-sim2-thumb--a { left: 42%; border-color: var(--ait-cy); transition-delay: 2.3s; }
+.ait-sim2-thumb--b { left: 64%; border-color: var(--ait-pr); transition-delay: 2.7s; }
+.ait-sim2-thumb--c { left: 50%; border-color: var(--ait-or); transition-delay: 3.1s; }
+.slide[data-active="true"] .ait-sim2-thumb,
+.slide[data-seen="true"] .ait-sim2-thumb { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+.slide[data-seen="true"]:not([data-active="true"]) .ait-sim2-thumb { transition-duration: 0s; transition-delay: 0s; }
+.ait-sim2-out { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--ait-brd); display: flex; flex-direction: column; gap: 4px; opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease 3.4s, transform 0.5s ease 3.4s; }
+.slide[data-active="true"] .ait-sim2-out,
+.slide[data-seen="true"] .ait-sim2-out { opacity: 1; transform: translateY(0); }
+.slide[data-seen="true"]:not([data-active="true"]) .ait-sim2-out { transition-duration: 0s; transition-delay: 0s; }
 .ait-sim2-out-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
 .ait-sim2-out-k { font-family: var(--ait-mono); color: var(--ait-t2); letter-spacing: 0.04em; }
 .ait-sim2-out-v { font-weight: 700; color: var(--ait-t1); }
 .ait-sim2-out-v--gn { color: var(--ait-gn); }
-.ait-sim2-actions { display: flex; gap: 8px; padding-top: 8px; }
+.ait-sim2-actions { display: flex; gap: 8px; padding-top: 8px; opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease 3.8s, transform 0.5s ease 3.8s; }
+.slide[data-active="true"] .ait-sim2-actions,
+.slide[data-seen="true"] .ait-sim2-actions { opacity: 1; transform: translateY(0); }
+.slide[data-seen="true"]:not([data-active="true"]) .ait-sim2-actions { transition-duration: 0s; transition-delay: 0s; }
 .ait-sim2-btn { flex: 1; height: 32px; border: 0; border-radius: 6px; font-family: var(--ait-sans); font-size: 12px; font-weight: 600; cursor: pointer; }
 .ait-sim2-btn--primary { background: linear-gradient(120deg, var(--ait-pr), var(--ait-cy)); color: #fff; box-shadow: 0 6px 14px rgba(168,85,247,0.30); }
 .ait-sim2-btn--ghost { background: transparent; border: 1px solid var(--ait-brd); color: var(--ait-t2); }
