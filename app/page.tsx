@@ -395,13 +395,9 @@ function SlideDashboard({ lang }: { lang: LangId }) {
                 </div>
               ) : (
                 <>
-                  <div className="ait-track-preview-head">
-                    <span className="ait-track-preview-kicker">
-                      <span className="tw-prop" style={{ '--tw-d': '0s', '--tw-dur': '1s' } as CSSProperties}>{detail.stage}</span>
-                    </span>
-                    <span className="ait-track-preview-owner">
-                      <span className="tw-prop" style={{ '--tw-d': '0s', '--tw-dur': '0.5s' } as CSSProperties}>{detail.owner}</span>
-                    </span>
+                  <div className="ait-track-preview-head tw-line" style={{ '--tw-d': '0s' } as CSSProperties}>
+                    <span className="ait-track-preview-kicker">{detail.stage}</span>
+                    <span className="ait-track-preview-owner">{detail.owner}</span>
                   </div>
                   <div className="ait-track-preview-title">
                     <span className="tw-prop" style={{ '--tw-d': '0.8s', '--tw-dur': '0.8s' } as CSSProperties}>{sc.cards['ia'].title}</span>
